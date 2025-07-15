@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Commerce Search</title>
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2980b9;
+            --accent-color: #e67e22;
+            --gray-light: #f8f9fa;
+            --gray: #e9ecef;
+            --gray-dark: #343a40;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--gray-light);
+            color: var(--gray-dark);
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .search-container {
+            display: flex;
+            margin: 20px 0;
+            gap: 10px;
+        }
+        .search-bar {
+            flex-grow: 1;
+            position: relative;
+        }
+        input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--gray);
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        .search-button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .search-button:hover {
+            background-color: var(--secondary-color);
+        }
+        .filters {
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .filter-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+        .filter-item {
+            flex: 1;
+        }
+        .filter-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .product-card {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .product-image {
+            height: 200px;
+            background-color: var(--gray);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray-dark);
+        }
+        .product-info {
+            padding: 15px;
+        }
+        .product-name {
+            font-weight: bold;
+            margin: 0 0 5px 0;
+            font-size: 16px;
+        }
+        .product-category {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0 0 10px 0;
+        }
+        .product-price {
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 18px;
+            margin: 0 0 15px 0;
+        }
+        .product-stock {
+            font-size: 14px;
+            color: #28a745;
+            margin: 0 0 15px 0;
+        }
+        .buy-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 15px;
+            width: 100%;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        .buy-button:hover {
+            background-color: #d35400;
+        }
+        .score-badge {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 20px;
+            padding: 3px 8px;
+            font-size: 12px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 200;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .modal-title {
+            margin-top: 0;
+        }
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin: 20px 0;
+        }
+        .quantity-button {
+            background-color: var(--gray);
+            border: none;
+            width: 30px;
+            height: 30px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .quantity-input {
+            width: 50px;
+            height: 30px;
+            text-align: center;
+            border: 1px solid var(--gray);
+            margin: 0 5px;
+        }
+        .confirm-button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.2s;
+        }
+        .confirm-button:hover {
+            background-color: #d35400;
+        }
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            display: none;
+            z-index: 300;
+        }
+        .cart-icon {
+            position: relative;
+            font-size: 20px;
+            margin-right: 10px;
+        }
+        .cart-count {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        .spinner {
+            border: 4px solid var(--gray);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6c757d;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">ShopSearch</div>
+            <div class="cart-icon">
+                🛒
+                <span class="cart-count">0</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Search for products...">
+            </div>
+            <button class="search-button" id="search-button">Search</button>
+        </div>
+
+        <div class="filters">
+            <div class="filter-row">
+                <div class="filter-item">
+                    <label class="filter-label" for="category-filter">Category</label>
+                    <select id="category-filter">
+                        <option value="">All Categories</option>
+                        <option value="Electronics">Electronics</option>
+                        <option value="Clothing">Clothing</option>
+                        <option value="Home">Home & Kitchen</option>
+                        <option value="Books">Books</option>
+                    </select>
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label" for="min-price">Min Price</label>
+                    <input type="number" id="min-price" placeholder="Min Price">
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label" for="max-price">Max Price</label>
+                    <input type="number" id="max-price" placeholder="Max Price">
+                </div>
+                <div class="filter-item">
+                    <label class="filter-label" for="results-limit">Results</label>
+                    <select id="results-limit">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="loading">
+            <div class="spinner"></div>
+            <p>Searching products...</p>
+        </div>
+
+        <div class="no-results">
+            <h3>No products found</h3>
+            <p>Try adjusting your search or filters</p>
+        </div>
+
+        <div class="product-grid" id="product-grid">
+            <!-- Products will be populated here by JavaScript -->
+        </div>
+    </div>
+
+    <!-- Buy Modal -->
+    <div id="buy-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h3 class="modal-title">Buy Product</h3>
+            <p id="modal-product-name"></p>
+            <p id="modal-product-price"></p>
+            <div class="quantity-selector">
+                <button class="quantity-button" id="decrease-quantity">-</button>
+                <input type="number" class="quantity-input" id="quantity" value="1" min="1" max="99">
+                <button class="quantity-button" id="increase-quantity">+</button>
+            </div>
+            <button class="confirm-button" id="confirm-purchase">Confirm Purchase</button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <script>
+        // DOM Elements
+        const searchInput = document.getElementById('search-input');
+        const searchButton = document.getElementById('search-button');
+        const categoryFilter = document.getElementById('category-filter');
+        const minPriceFilter = document.getElementById('min-price');
+        const maxPriceFilter = document.getElementById('max-price');
+        const resultsLimit = document.getElementById('results-limit');
+        const productGrid = document.getElementById('product-grid');
+        const buyModal = document.getElementById('buy-modal');
+        const modalClose = document.querySelector('.close');
+        const modalProductName = document.getElementById('modal-product-name');
+        const modalProductPrice = document.getElementById('modal-product-price');
+        const quantityInput = document.getElementById('quantity');
+        const decreaseQuantity = document.getElementById('decrease-quantity');
+        const increaseQuantity = document.getElementById('increase-quantity');
+        const confirmPurchase = document.getElementById('confirm-purchase');
+        const notification = document.getElementById('notification');
+        const cartCount = document.querySelector('.cart-count');
+        const loading = document.querySelector('.loading');
+        const noResults = document.querySelector('.no-results');
+
+        // State
+        let currentProductId = null;
+        let cartItems = 0;
+        
+        // API URL (change this to your actual API endpoint)
+        const API_URL = 'http://localhost:8000/api';
+
+        // Event Listeners
+        searchButton.addEventListener('click', searchProducts);
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                searchProducts();
+            }
+        });
+
+        modalClose.addEventListener('click', () => {
+            buyModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === buyModal) {
+                buyModal.style.display = 'none';
+            }
+        });
+
+        decreaseQuantity.addEventListener('click', () => {
+            if (quantityInput.value > 1) {
+                quantityInput.value = parseInt(quantityInput.value) - 1;
+            }
+        });
+
+        increaseQuantity.addEventListener('click', () => {
+            quantityInput.value = parseInt(quantityInput.value) + 1;
+        });
+
+        confirmPurchase.addEventListener('click', purchaseProduct);
+
+        // Functions
+        async function rebuildSystem() {
+            try {
+                const response = await fetch(`${API_URL}/rebuild`);
+                
+                if (response.ok) {
+                    console.log('System rebuilt successfully');
+                    return true;
+                } else {
+                    console.error('Failed to rebuild system');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error rebuilding system:', error);
+                return false;
+            }
+        }
+        
+        async function searchProducts() {
+            const query = searchInput.value.trim();
+            if (!query) {
+                showNotification('Please enter a search query', 'error');
+                return;
+            }
+
+            // Show loading state
+            loading.style.display = 'block';
+            productGrid.innerHTML = '';
+            noResults.style.display = 'none';
+
+            // Build query parameters
+            const params = new URLSearchParams({
+                q: query,
+                limit: resultsLimit.value
+            });
+
+            if (categoryFilter.value) {
+                params.append('category', categoryFilter.value);
+            }
+
+            if (minPriceFilter.value) {
+                params.append('min_price', minPriceFilter.value);
+            }
+
+            if (maxPriceFilter.value) {
+                params.append('max_price', maxPriceFilter.value);
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/query?${params}`);
+                const data = await response.json();
+                
+                // Hide loading state
+                loading.style.display = 'none';
+                
+                if (data.length === 0) {
+                    noResults.style.display = 'block';
+                    return;
+                }
+
+                displayProducts(data);
+            } catch (error) {
+                loading.style.display = 'none';
+                showNotification('Error searching products. Please try again.', 'error');
+                console.error('Error searching products:', error);
+            }
+        }
+
+        function displayProducts(products) {
+            productGrid.innerHTML = '';
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.classList.add('product-card');
+                productCard.innerHTML = `
+                    <div class="product-image">
+                        <div style="position: relative;">
+                            <span>Product Image</span>
+                            <span class="score-badge">Score: ${product.score.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <p class="product-category">${product.category}</p>
+                        <p class="product-price">$${product.price.toFixed(2)}</p>
+                        <p class="product-stock">In Stock: ${product.inventory_count}</p>
+                        <button class="buy-button" data-product-id="${product.product_id}" 
+                            data-name="${product.name}" data-price="${product.price}">
+                            Add to Cart
+                        </button>
+                    </div>
+                `;
+                
+                productGrid.appendChild(productCard);
+                
+                // Add event listener to buy button
+                const buyButton = productCard.querySelector('.buy-button');
+                buyButton.addEventListener('click', function() {
+                    openBuyModal(
+                        this.getAttribute('data-product-id'),
+                        this.getAttribute('data-name'),
+                        this.getAttribute('data-price')
+                    );
+                });
+            });
+        }
+
+        function openBuyModal(productId, name, price) {
+            currentProductId = productId;
+            modalProductName.textContent = name;
+            modalProductPrice.textContent = `Price: $${parseFloat(price).toFixed(2)}`;
+            quantityInput.value = 1;
+            buyModal.style.display = 'block';
+        }
+
+        async function purchaseProduct() {
+            const quantity = parseInt(quantityInput.value);
+            
+            if (isNaN(quantity) || quantity < 1) {
+                showNotification('Please enter a valid quantity', 'error');
+                return;
+            }
+
+            // Assuming user ID 1 for simplicity
+            const userId = 1;
+
+            try {
+                const response = await fetch(`${API_URL}/buy`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: userId,
+                        product_id: parseInt(currentProductId),
+                        quantity: quantity
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    buyModal.style.display = 'none';
+                    showNotification('Purchase successful!', 'success');
+                    
+                    // Update cart count
+                    cartItems += quantity;
+                    cartCount.textContent = cartItems;
+                    
+                    // Call rebuild API to update indexes and models
+                    await rebuildSystem();
+                    
+                    // Refresh search results if there's an active search
+                    if (searchInput.value.trim()) {
+                        searchProducts();
+                    }
+                } else {
+                    showNotification(data.detail || 'Purchase failed', 'error');
+                }
+            } catch (error) {
+                showNotification('Error processing purchase. Please try again.', 'error');
+                console.error('Error purchasing product:', error);
+            }
+        }
+
+        function showNotification(message, type = 'success') {
+            notification.textContent = message;
+            notification.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Initialize with some popular products
+        function initializeApp() {
+            searchInput.value = "laptop";
+            searchProducts();
+        }
+
+        // Start the app
+        initializeApp();
+    </script>
+</body>
+</html>
