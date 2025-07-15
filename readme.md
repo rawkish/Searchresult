@@ -3,6 +3,8 @@
 Run query.py in app\api to launch backend built using fastapi.
 A simple frontend with basic operations and views is also provided here.
 
+For cli use rank_candidates.py
+
 
 📌 Problem Statement
 
